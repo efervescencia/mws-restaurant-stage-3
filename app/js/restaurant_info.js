@@ -97,10 +97,10 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
   
-  const favourite = document.getElementById('favourite_id');
-  favourite.checked = restaurant.is_favorite;
-  favourite.addEventListener('change', event => {
-  DBHelper.marcarFavourite(restaurant, event.target.checked);
+  const favorite = document.getElementById('favorite_id');
+  favorite.checked = restaurant.is_favorite;
+  favorite.addEventListener('change', event => {
+  DBHelper.marcarFavorite(restaurant, event.target.checked);
 	});
 
   // fill operating hours

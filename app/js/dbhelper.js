@@ -259,6 +259,36 @@ class DBHelper {
     );
     return marker;
   } */
-
+  
+  
+  	static marcarFavorite(restaurant, esFavorite) {
+  		
+	fetch(`${DBHelper.DATABASE_URL}/${restaurant.id}/?is_favorite=${esFavorite}`, {
+		method: 'PUT'
+	}).then(response => {
+			return response.json();
+		})
+		.then(datos => {
+			DBHelper.dbPromise.then(db => {
+				const tx = db.transaction('restaurants', 'readwrite');
+				const store = tx.objectStore('restaurants');
+				store.put(datos)
+			});
+			return datos;
+		})
+		.catch(error => {
+			restaurant.is_favorite = esFavorite;
+			DBHelper.dbPromise.then(db => {
+				const tx = db.transaction('restaurants', 'readwrite');
+				const store = tx.objectStore('restaurants');
+				store.put(restaurant);
+			}).catch(error => {
+				console.log(error);
+				return;
+				});
+		});
+	}
+	
+	
 }
 
