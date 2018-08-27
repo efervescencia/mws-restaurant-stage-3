@@ -263,6 +263,8 @@ class DBHelper {
   
   	static marcarFavorite(restaurant, esFavorite) {
   		
+  		console.log(esFavorite);
+  		
 	fetch(`${DBHelper.DATABASE_URL}/${restaurant.id}/?is_favorite=${esFavorite}`, {
 		method: 'PUT'
 	}).then(response => {
@@ -277,6 +279,7 @@ class DBHelper {
 			return datos;
 		})
 		.catch(error => {
+			//no hay internet
 			restaurant.is_favorite = esFavorite;
 			DBHelper.dbPromise.then(db => {
 				const tx = db.transaction('restaurants', 'readwrite');

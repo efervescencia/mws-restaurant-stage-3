@@ -97,12 +97,23 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
   
+  /*
   const favorite = document.getElementById('favorite_id');
   favorite.checked = restaurant.is_favorite;
   favorite.addEventListener('change', event => {
   DBHelper.marcarFavorite(restaurant, event.target.checked);
 	});
-
+	*/ 
+ 
+  const favorite2 = document.getElementById('favorite2_id');
+  if(restaurant.is_favorite){
+  	favorite2.innerHTML="<span aria-hidden='true'>&#x2764;</span>";
+  }
+  else{
+  	favorite2.innerHTML="<span aria-hidden='true'>&#x2661;</span>";
+  }
+ 
+ 
   // fill operating hours
   if (restaurant.operating_hours) {
     fillRestaurantHoursHTML();
@@ -201,4 +212,39 @@ getParameterByName = (name, url) => {
   if (!results[2])
     return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
+
+
+function toggleCheckbox(event) {
+
+  var node = event.currentTarget;
+  var state = node.getAttribute('aria-checked').toLowerCase();
+
+  if (event.type === 'click' || 
+      (event.type === 'keydown' && event.keyCode === 32)
+      ) {
+          if (state === 'true') {
+            node.setAttribute('aria-checked', 'false');
+            node.innerHTML="<span aria-hidden='true'>&#x2764;</span>";
+				DBHelper.marcarFavorite(self.restaurant, state);
+          }
+          else {
+            node.setAttribute('aria-checked', 'true');
+            node.innerHTML="<span aria-hidden='true'>&#x2661;</span>";
+            DBHelper.marcarFavorite(self.restaurant, state);
+          }  
+
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+}
+
+function focusCheckbox(event) {
+  event.currentTarget.className += ' focus';
+}
+
+function blurCheckbox(event) {
+  event.currentTarget.className = event.currentTarget.className .replace(' focus','');
 }

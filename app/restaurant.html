@@ -43,7 +43,12 @@
     <!-- Beginning restaurant -->
     <section id="restaurant-container">
       <h2 id="restaurant-name"></h2>
-      <span><label>Favorite<input type="checkbox" id="favorite_id" aria-label="Favorite"></label></span>
+      <!--<span><label>Favorite<input type="checkbox" id="favorite_id" aria-label="Favorite"></label></span>-->
+       <span role="checkbox" id="favorite2_id" aria-checked="false" aria-label="Favorite"
+       tabindex="0" onkeydown="toggleCheckbox(event)" onclick="toggleCheckbox(event)"
+       onfocus="focusCheckbox(event)" onblur="blurCheckbox(event)">
+    <span aria-hidden='true'>&#x2661;</span>
+  </span></br>
       <img id="restaurant-img">
       <p id="restaurant-cuisine"></p>
       <p id="restaurant-address"></p>

@@ -1,7 +1,7 @@
 //Primero registramos el service worker sw.js  en raiz
 
 
-
+/*
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
     navigator.serviceWorker.register('sw.js').then(function(registration) {
@@ -13,6 +13,7 @@ if ('serviceWorker' in navigator) {
     });
   });
 }
+*/
 
 
 //activamos el listener para instalar la app
