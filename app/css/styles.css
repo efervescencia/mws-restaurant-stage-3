@@ -322,28 +322,6 @@ header h1:hover, h1:focus {
   color: #666;
 }
 
-/* span like checkbox  */
- 
-span[role=checkbox] {
-   margin: 0;
-   padding: 0;    
-   border: 2px transparent solid;
-   color: red;
-   font-size: 4em;
-}
-
-span[role=checkbox]:active {
-  background-color: #bbb;
-}
-  
-span[role=checkbox]:hover {
-   border-color: #777;
-}
-
-span[role=checkbox].focus {
-   border-color: black;
-}
-
 
 
 @media screen and (min-width:550px){
@@ -398,7 +376,7 @@ padding: 140px 40px 30px;
 
 
 #breadcrumb {
-    width: 34%;
+    width: calc(50% - 80px);
 }
 
 	

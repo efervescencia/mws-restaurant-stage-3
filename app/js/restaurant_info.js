@@ -1,4 +1,5 @@
 let restaurant;
+let reviews;
 var newMap;
 
 /**
@@ -96,30 +97,29 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
 
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
-  
-  /*
-  const favorite = document.getElementById('favorite_id');
-  favorite.checked = restaurant.is_favorite;
-  favorite.addEventListener('change', event => {
-  DBHelper.marcarFavorite(restaurant, event.target.checked);
-	});
-	*/ 
- 
-  const favorite2 = document.getElementById('favorite2_id');
-  if(restaurant.is_favorite){
-  	favorite2.innerHTML="<span aria-hidden='true'>&#x2764;</span>";
-  }
-  else{
-  	favorite2.innerHTML="<span aria-hidden='true'>&#x2661;</span>";
-  }
- 
- 
+
   // fill operating hours
   if (restaurant.operating_hours) {
     fillRestaurantHoursHTML();
   }
   // fill reviews
-  fillReviewsHTML();
+  getReviews();
+}
+
+
+getReviews = (restaurant_id = self.restaurant.id) =>{
+
+console.log(`${DBHelper.DATABASE_URL}/reviews/?restaurant_id=${restaurant_id}`);
+fetch(`${DBHelper.DATABASE_URL}/reviews/?restaurant_id=${restaurant_id}`)
+					.then(response => {
+					return response.json();
+					})
+					.then(reviews => {
+					self.reviews = reviews;
+					console.log(reviews);
+					fillReviewsHTML();
+					}); 
+
 }
 
 /**
@@ -145,7 +145,7 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
 /**
  * Create all reviews HTML and add them to the webpage.
  */
-fillReviewsHTML = (reviews = self.restaurant.reviews) => {
+fillReviewsHTML = (reviews = self.reviews) => {
   const container = document.getElementById('reviews-container');
   const title = document.createElement('h3');
   title.innerHTML = 'Reviews';
@@ -174,7 +174,7 @@ createReviewHTML = (review) => {
   li.appendChild(name);
 
   const date = document.createElement('p');
-  date.innerHTML = review.date;
+  date.innerHTML = new Date(review.createdAt*1000);
   li.appendChild(date);
 
   const rating = document.createElement('p');
@@ -212,39 +212,4 @@ getParameterByName = (name, url) => {
   if (!results[2])
     return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
-}
-
-
-
-function toggleCheckbox(event) {
-
-  var node = event.currentTarget;
-  var state = node.getAttribute('aria-checked').toLowerCase();
-
-  if (event.type === 'click' || 
-      (event.type === 'keydown' && event.keyCode === 32)
-      ) {
-          if (state === 'true') {
-            node.setAttribute('aria-checked', 'false');
-            node.innerHTML="<span aria-hidden='true'>&#x2764;</span>";
-				DBHelper.marcarFavorite(self.restaurant, state);
-          }
-          else {
-            node.setAttribute('aria-checked', 'true');
-            node.innerHTML="<span aria-hidden='true'>&#x2661;</span>";
-            DBHelper.marcarFavorite(self.restaurant, state);
-          }  
-
-    event.preventDefault();
-    event.stopPropagation();
-  }
-
-}
-
-function focusCheckbox(event) {
-  event.currentTarget.className += ' focus';
-}
-
-function blurCheckbox(event) {
-  event.currentTarget.className = event.currentTarget.className .replace(' focus','');
 }

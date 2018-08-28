@@ -17,7 +17,7 @@ class DBHelper {
   	
   	//puerto cambiado a node server 1337
     const port = 1337 // Change this to your server port
-    return `http://localhost:${port}/restaurants`;
+    return `http://localhost:${port}`;
   }
   
   
@@ -52,7 +52,7 @@ class DBHelper {
 			else 
 				{
 					// los sacamos de internet
-					fetch(`${DBHelper.DATABASE_URL}`)
+					fetch(`${DBHelper.DATABASE_URL}/restaurants`)
 					.then(response => {
 					return response.json();
 					})
@@ -259,39 +259,6 @@ class DBHelper {
     );
     return marker;
   } */
-  
-  
-  	static marcarFavorite(restaurant, esFavorite) {
-  		
-  		console.log(esFavorite);
-  		
-	fetch(`${DBHelper.DATABASE_URL}/${restaurant.id}/?is_favorite=${esFavorite}`, {
-		method: 'PUT'
-	}).then(response => {
-			return response.json();
-		})
-		.then(datos => {
-			DBHelper.dbPromise.then(db => {
-				const tx = db.transaction('restaurants', 'readwrite');
-				const store = tx.objectStore('restaurants');
-				store.put(datos)
-			});
-			return datos;
-		})
-		.catch(error => {
-			//no hay internet
-			restaurant.is_favorite = esFavorite;
-			DBHelper.dbPromise.then(db => {
-				const tx = db.transaction('restaurants', 'readwrite');
-				const store = tx.objectStore('restaurants');
-				store.put(restaurant);
-			}).catch(error => {
-				console.log(error);
-				return;
-				});
-		});
-	}
-	
-	
+
 }
 
