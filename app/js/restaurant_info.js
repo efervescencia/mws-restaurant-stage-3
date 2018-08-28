@@ -213,3 +213,55 @@ getParameterByName = (name, url) => {
     return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
+
+
+function toggleCheckbox(event) {
+
+  var node = event.currentTarget;
+  var state = node.getAttribute('aria-checked').toLowerCase();
+
+  if (event.type === 'click' || 
+      (event.type === 'keydown' && event.keyCode === 32)
+      ) {
+          if (state === 'true') {
+            node.setAttribute('aria-checked', 'false');
+            node.innerHTML="<span aria-hidden='true'>&#x2764;</span>";
+          }
+          else {
+            node.setAttribute('aria-checked', 'true');
+            node.innerHTML="<span aria-hidden='true'>&#x2661;</span>";  
+          }
+          
+          console.log("cambiamos el estado del corazon");
+          fetch(`${DBHelper.DATABASE_URL}/restaurants/${self.restaurant.id}/?is_favorite=${state}`, {
+				method: 'PUT'
+				})
+				.then(response => {
+				return response.json();
+				})
+					.then(data => {
+						DBHelper.dbPromise.then(db => {
+						const tx = db.transaction('restaurants', 'readwrite');
+						const store = tx.objectStore('restaurants');
+						store.put(data);
+						});
+					});  
+
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+}
+
+function focusCheckbox(event) {
+  event.currentTarget.className += ' focus';
+}
+
+function blurCheckbox(event) {
+  event.currentTarget.className = event.currentTarget.className .replace(' focus','');
+}
+
+
+
+
+
