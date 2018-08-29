@@ -327,7 +327,7 @@ header h1:hover, h1:focus {
  
 span[role=checkbox] {
    margin: 0;    
-   border: 2px transparent solid;
+   border: 1px transparent solid;
    color: red;
 	font-size: 18px;
 }
