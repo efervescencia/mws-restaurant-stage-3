@@ -28,6 +28,8 @@ class DBHelper {
 
 			return idb.open('restaurants', 1, function (upgradeDb) {
 				upgradeDb.createObjectStore('restaurants', { keyPath: 'id' });
+				upgradeDb.createObjectStore('reviews', { keyPath: 'id' });
+				upgradeDb.createObjectStore('reviews-pending', {keyPath: 'id', autoIncrement: true});
 			});
 	}
 
@@ -259,6 +261,88 @@ class DBHelper {
     );
     return marker;
   } */
+
+
+	static submitReview(review) {
+		
+		fetch(`${DBHelper.DATABASE_URL}/reviews`, {
+			body: JSON.stringify(review), 
+			cache: 'no-cache', 
+			credentials: 'same-origin', 
+			headers: {
+			'content-type': 'application/json'
+			},
+			method: 'POST',
+			mode: 'cors', 
+			redirect: 'follow', 
+			referrer: 'no-referrer', 
+		})
+		.then(response => {
+			response.json()
+				.then(datos => {
+					//SI LA SUBIDA ES CORRECTA NOS DEVOLVERA UNA REVIEW CON UN ID CORRECTO
+					//Y ESA REVIEW LA METEMOS EN LA BASE DE DATOS DE REVIEWS
+					DBHelper.dbPromise.then(db => {
+						// Put fetched reviews into IDB
+						const tx = db.transaction('reviews', 'readwrite');
+						const store = tx.objectStore('reviews');
+						store.put(datos);
+					});
+					return datos;
+				})
+		})
+		.catch(error => {
+			//SI LA SUBIDA NO ES CORRECTA NOS DEVOLVERA LA REVIEW VACIA, O ERROR O NADA
+			// Y ESA REVIEW LA METEMOS EN LA BASE DE DATOS DE REVIEWS-PENDING QUE TIENE EL ID COMO AUTOINCREMENT
+			// ADEMAS TENDREMOS QUE PONER UN LISTENER PARA CUANDO HAY INTERNET QUE VUELVA A SUBIRLO DESDE PENDING
+			// Y LA BORRE DE PENDING CUANDO LE DEVUELVA LA REVIEW CORRECTA ADEMAS DE METERLA EN LA BASE DE DATOS
+
+			data['updatedAt'] = new Date().getTime();
+			console.log(datos);
+			
+			this.dbPromise.then(db => {
+				if (!db) return;
+				// Put fetched reviews into IDB
+				const tx = db.transaction('reviews-pending', 'readwrite');
+				const store = tx.objectStore('reviews-pending');
+				store.put(datos);
+				console.log('Review guardada para enviar mas tarde');
+			});
+			return;
+		});
+}
+
+
+
+
+	static submitOfflineReviews() {
+		DBHelper.dbPromise.then(db => {
+			const tx = db.transaction('reviews-pending');
+			const store = tx.objectStore('reviews-pending');
+			store.getAll().then(offlineReviews => {
+				offlineReviews.forEach(review => {
+					console.log(review);
+					DBHelper.submitReview(review);
+				})
+				//Borramos las reviews
+				DBHelper.clearOfflineReviews();
+			})
+		})
+	}
+
+	static clearOfflineReviews() {
+		DBHelper.dbPromise.then(db => {
+			const tx = db.transaction('reviews-pending', 'readwrite');
+			const store = tx.objectStore('reviews-pending').clear();
+		})
+		return;
+	}
+
+
+
+
+
+
 
 }
 

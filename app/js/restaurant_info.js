@@ -83,7 +83,19 @@ fetchRestaurantFromURL = (callback) => {
 fillRestaurantHTML = (restaurant = self.restaurant) => {
   const name = document.getElementById('restaurant-name');
   name.innerHTML = restaurant.name;
-
+  
+  const is_favorite = document.getElementById("favorite2_id");
+  state = restaurant.is_favorite;
+  if (state === 'true') {
+  	is_favorite.setAttribute('aria-checked', 'false');
+  	is_favorite.innerHTML="<span aria-hidden='true'>&#x2764;</span>";
+  }
+  else {
+  	is_favorite.setAttribute('aria-checked', 'true');
+  	is_favorite.innerHTML="<span aria-hidden='true'>&#x2661;</span>";  
+       }
+  
+  
   const address = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
 
@@ -108,9 +120,12 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
 
 
 getReviews = (restaurant_id = self.restaurant.id) =>{
+	
 
-console.log(`${DBHelper.DATABASE_URL}/reviews/?restaurant_id=${restaurant_id}`);
-fetch(`${DBHelper.DATABASE_URL}/reviews/?restaurant_id=${restaurant_id}`)
+					console.log("las reviews no estan en la base de datos");
+					// los sacamos de internet
+		console.log(`${DBHelper.DATABASE_URL}/reviews/?restaurant_id=${restaurant_id}`);
+		fetch(`${DBHelper.DATABASE_URL}/reviews/?restaurant_id=${restaurant_id}`)
 					.then(response => {
 					return response.json();
 					})
@@ -118,9 +133,25 @@ fetch(`${DBHelper.DATABASE_URL}/reviews/?restaurant_id=${restaurant_id}`)
 					self.reviews = reviews;
 					console.log(reviews);
 					fillReviewsHTML();
-					}); 
+					}).then(reviews => {
+					// las metemos en la base de datos
+					
+						DBHelper.dbPromise.then(function(db) {
+  						var tx = db.transaction('reviews', 'readwrite');
+  						var store = tx.objectStore('reviews');
+						self.reviews.forEach(review => {
+						store.put(review);
+						console.log('añadida review a la BD'+review.id);
+						});
+						})
+						.catch(error => {
+						// Error en internet
+						callback(error, null);
+						});						
+						});									
+  							
 
-}
+				}
 
 /**
  * Create restaurant operating hours HTML table and add it to the webpage.
@@ -233,25 +264,28 @@ function toggleCheckbox(event) {
           }
           
           console.log("cambiamos el estado del corazon");
+          //cambiamos primero la variable
+          self.restaurant.is_favorite = state;
+          //ahora cambiamos en internet
+          console.log("hemos cambiado la variable is favorite a: "+self.restaurant.is_favorite);
           fetch(`${DBHelper.DATABASE_URL}/restaurants/${self.restaurant.id}/?is_favorite=${state}`, {
 				method: 'PUT'
 				})
+					//ahora lo cambiamos en la base de datos
+					DBHelper.dbPromise.then(db => {
+					const tx = db.transaction('restaurants', 'readwrite');
+					const store = tx.objectStore('restaurants');
+					store.put(self.restaurant);
+						})
 				.then(response => {
 				return response.json();
-				})
-					.then(data => {
-						DBHelper.dbPromise.then(db => {
-						const tx = db.transaction('restaurants', 'readwrite');
-						const store = tx.objectStore('restaurants');
-						store.put(data);
-						});
-					});  
-
+				});
     event.preventDefault();
     event.stopPropagation();
   }
 
 }
+
 
 function focusCheckbox(event) {
   event.currentTarget.className += ' focus';
@@ -262,6 +296,43 @@ function blurCheckbox(event) {
 }
 
 
+function submitReview(){
+
+console.log("Vamos a enviar el formulario");
+const review_name  = document.getElementById('name').value;
+const options_rating = document.getElementById('rating');
+const review_rating = options_rating.options[options_rating.selectedIndex].value;
+const review_text = document.getElementById('comments').value;
+
+const review = {"restaurant_id": self.restaurant.id,
+					"name": review_name,
+					"rating": review_rating,
+					"comments": review_text
+				};
+
+console.log(review);
+
+const ul = document.getElementById('reviews-list');
+ul.appendChild(createReviewHTML(review));
+document.getElementById("submit-review-form-id").reset();
+
+//PRIMERO INTENTAMOS SUBIRLO A INTERNET
+	DBHelper.submitReview(review)
+		.then(data => {
+console.log("subida a internet la review: "+data);
+		})
+		.catch(error => {
+			console.error(error);
+			window.addEventListener('online', goOnline);
+			});
+	}
+
+
+	function goOnline() {
+			//hemos recuperado conexion!!!
+			console.log('Internet on!!!');
+    		DBHelper.submitOfflineReviews();
+}
 
 
 

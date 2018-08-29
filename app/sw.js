@@ -10,6 +10,7 @@
 'js/restaurant_info.js',
 'js/dbhelper.js',
 'js/idb.js',
+'img/',
 'img/1.jpg',
 'img/2.jpg',
 'img/3.jpg',
