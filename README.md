@@ -143,3 +143,24 @@ http://localhost:1337/reviews/<review_id>
 
 If you find a bug in the source code or a mistake in the documentation, you can help us by
 submitting an issue to our [Waffle Dashboard](https://waffle.io/udacity/mwnd-issues). Even better you can submit a Pull Request with a fix :)
+
+
+
+
+### RUNNING THE APPLICATION
+
+1.- Is neccesary to enable the data server, so:
+
+node server
+
+2.- Is neccesary to enable the web server, so:
+
+cd app
+python -m SimpleHTTPServer 8000
+
+
+3.- Open in navigator the url:   localhost:8000/app
+
+
+
+

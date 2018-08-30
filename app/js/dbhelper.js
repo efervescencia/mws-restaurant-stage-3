@@ -303,7 +303,7 @@ class DBHelper {
 	static submitReviewPending(review){
 			
 
-			review['updatedAt'] = new Date().getTime();
+			review['updatedAt'] = Date.now();
 			console.log("metida a review el campo updatedAt");			
 			console.log(review);
 			

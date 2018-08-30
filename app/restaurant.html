@@ -62,19 +62,36 @@
       		<!-- Beginning Form submit review -->
 			<form id="submit-review-form-id">
 				<h3>Submit your review</h3>
-				<p><label for="name">Name:</label>
-				<input type="text" id="name" name="name" placeholder="Your Name." required /></p>
-				<p><label for="rating">Rating</label>
+				<table>
+				<tr>
+				<td><label for="name">Name:</label></td>
+				<td><input type="text" id="name" name="name" placeholder="Your Name." required /></td>
+				</tr></br>
+				<tr>
+				<td><label for="rating">Rating</label></td>
+				<td>
 				<select name="rating" id="rating">
 						<option value="1">1</option>
 						<option value="2">2</option>
 						<option value="3">3</option>
 						<option value="4">4</option>
 						<option value="5">5</option>
-				</select></p>
-				<p><label>Your review.</br><textarea rows="3" name="comments" id="comments" 
-				placeholder="Your review here." required></textarea></label></p>
-				<p><button type="button" onclick="submitReview()">Submit Review</button></p>
+				</select></td>
+				</tr>
+				<tr><td COLSPAN=2>
+				<label for="comments">Your review.
+				</label>
+				</td></tr>
+				<tr><td COLSPAN=2><textarea rows="3" cols="30" name="comments" id="comments" 
+				placeholder="Your review here." required></textarea>
+				</td>				
+				</tr>
+				<tr>
+				<td COLSPAN=2>				
+				<button type="button" onclick="submitReview()">Submit Review</button>
+				</td>				
+				</tr>
+				</table>
 			</form>
 		<!-- end Form submit review -->
     </section>

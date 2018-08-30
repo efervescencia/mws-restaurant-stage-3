@@ -323,7 +323,8 @@ function submitReview(){
 				"name": review_name,
 				"rating": review_rating,
 				"comments": review_text,
-				"updatedAt": new Date().getTime(),
+				"createdAt": Date.now(),
+				"updatedAt": Date.now(),
 				};
 
 		console.log(review);
