@@ -120,30 +120,21 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
 
 
 getReviews = (restaurant) =>{
-	//MAL IMPLEMENTADO FALTA LA PARTE DE CARGAR DE LA BASE DE DATOS
-	
-	//primero intentamos cargar de la base de datos
-	
-	//si no hay reviews en la base de datos y estamos online
-	//las intentamos cargar de internet y las metemos a la base de datos
-	
-	
-	//en ambos casos finalmente ponemos las reviews en la web
-	
-	
-
-					console.log("las reviews del restaurant: "+restaurant.name+", no estan en la base de datos");
-					// los sacamos de internet
-		console.log(`${DBHelper.DATABASE_URL}/reviews/?restaurant_id=${restaurant_id}`);
-		fetch(`${DBHelper.DATABASE_URL}/reviews/?restaurant_id=${restaurant_id}`)
+		
+	if(navigator.onLine){
+		console.log("ESTAMOS ONLINE!!!!!");
+		// los sacamos de internet
+		// console.log(`${DBHelper.DATABASE_URL}/reviews/?restaurant_id=${restaurant.id}`);
+		fetch(`${DBHelper.DATABASE_URL}/reviews/?restaurant_id=${restaurant.id}`)
 					.then(response => {
 					return response.json();
 					})
 					.then(reviews => {
 					self.reviews = reviews;
-					console.log(reviews);
+					console.log(self.reviews);
 					fillReviewsHTML();
-					}).then(reviews => {
+					})
+					.then(reviews => {
 					// las metemos en la base de datos
 					
 						DBHelper.dbPromise.then(function(db) {
@@ -158,10 +149,25 @@ getReviews = (restaurant) =>{
 						// Error en internet
 						callback(error, null);
 						});						
-						});									
-  							
+						});
+	
+	}	
+	else {
+		console.log("NOOOOOOOOOO ESTAMOS ONLINE!!!!!");
+		DBHelper.dbPromise.then(db => {
+			const tx = db.transaction('reviews');
+			const store = tx.objectStore('reviews');
+			var index = store.index("restaurant_id");
+			index.getAll(self.restaurant.id).then(reviews => {
+				self.reviews= reviews;
+				console.log(self.reviews);
+				fillReviewsHTML();
+				});});
+			}	
 
-				}
+				
+	}
+				
 
 /**
  * Create restaurant operating hours HTML table and add it to the webpage.
@@ -307,34 +313,46 @@ function blurCheckbox(event) {
 
 
 function submitReview(){
+	
+		const review_name  = document.getElementById('name').value;
+		const options_rating = document.getElementById('rating');
+		const review_rating = options_rating.options[options_rating.selectedIndex].value;
+		const review_text = document.getElementById('comments').value;
 
-console.log("Vamos a enviar el formulario");
-const review_name  = document.getElementById('name').value;
-const options_rating = document.getElementById('rating');
-const review_rating = options_rating.options[options_rating.selectedIndex].value;
-const review_text = document.getElementById('comments').value;
-
-const review = {"restaurant_id": self.restaurant.id,
-					"name": review_name,
-					"rating": review_rating,
-					"comments": review_text
+		let review = {"restaurant_id": self.restaurant.id,
+				"name": review_name,
+				"rating": review_rating,
+				"comments": review_text,
+				"updatedAt": new Date().getTime(),
 				};
 
-console.log(review);
+		console.log(review);
+		
+	
+		if(navigator.onLine){
+		console.log("ESTAMOS ONLINE!!!!!");
+		console.log("Vamos a enviar la review");
 
-const ul = document.getElementById('reviews-list');
-ul.appendChild(createReviewHTML(review));
-document.getElementById("submit-review-form-id").reset();
-
-//PRIMERO INTENTAMOS SUBIRLO A INTERNET
-	DBHelper.submitReview(review)
-		.then(data => {
-console.log("subida a internet la review: "+data);
-		})
-		.catch(error => {
-			console.error(error);
+		//INTENTAMOS SUBIRLO A INTERNET
+		review = DBHelper.submitReview(review);
+		console.log("subida a internet la review: "+review);			
+				
+		}
+		else {
+			// LO METEMOS EN BASE DE DATOS PENDING Y PONEMOS UN LISTENER PARA CUANDO VUELVA LA CONEXION
+			console.log("COMO NO ESTAMOS ONLINE...");
+			console.log("Vamos a enviar la review"+review);
+			DBHelper.submitReviewPending(review);			
 			window.addEventListener('online', goOnline);
-			});
+			
+			}
+			
+		//EN CUALQUIER CASO
+		//lo ponemos en la página y reseteamos el formulario
+		const ul = document.getElementById('reviews-list');
+		ul.appendChild(createReviewHTML(review));
+		document.getElementById("submit-review-form-id").reset();	
+			
 	}
 
 

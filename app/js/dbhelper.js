@@ -28,7 +28,8 @@ class DBHelper {
 
 			return idb.open('restaurants', 1, function (upgradeDb) {
 				upgradeDb.createObjectStore('restaurants', { keyPath: 'id' });
-				upgradeDb.createObjectStore('reviews', { keyPath: 'id' });
+				var reviewsOS = upgradeDb.createObjectStore('reviews', { keyPath: 'id' });
+				reviewsOS.createIndex('restaurant_id', 'restaurant_id', {unique: false});
 				upgradeDb.createObjectStore('reviews-pending', { keyPath: 'updatedAt' });
 			});
 	}
@@ -288,29 +289,34 @@ class DBHelper {
 						const store = tx.objectStore('reviews');
 						store.put(datos);
 					});
+					console.log("review subida a internet y puesta en la base de datos");
 					return datos;
 				})
 		})
 		.catch(error => {
-			//SI LA SUBIDA NO ES CORRECTA NOS DEVOLVERA LA REVIEW VACIA, O ERROR O NADA
-			// Y ESA REVIEW LA METEMOS EN LA BASE DE DATOS DE REVIEWS-PENDING QUE TIENE EL ID COMO AUTOINCREMENT
-			// ADEMAS TENDREMOS QUE PONER UN LISTENER PARA CUANDO HAY INTERNET QUE VUELVA A SUBIRLO DESDE PENDING
-			// Y LA BORRE DE PENDING CUANDO LE DEVUELVA LA REVIEW CORRECTA ADEMAS DE METERLA EN LA BASE DE DATOS
+			console.log(error);
+			});
+			return review;
+			}
+			
+			
+	static submitReviewPending(review){
+			
 
-			data['updatedAt'] = new Date().getTime();
-			console.log(datos);
+			review['updatedAt'] = new Date().getTime();
+			console.log("metida a review el campo updatedAt");			
+			console.log(review);
 			
 			this.dbPromise.then(db => {
-				if (!db) return;
-				// Put fetched reviews into IDB
+				// La ponemos como pendiente
 				const tx = db.transaction('reviews-pending', 'readwrite');
 				const store = tx.objectStore('reviews-pending');
-				store.put(datos);
-				console.log('Review guardada para enviar mas tarde');
+				store.put(review);
+				console.log("Review guardada para enviar mas tarde");
 			});
-			return;
-		});
-}
+			return review;
+			
+	}
 
 
 
@@ -326,8 +332,8 @@ class DBHelper {
 				})
 				//Borramos las reviews
 				DBHelper.clearOfflineReviews();
-			})
-		})
+			});
+		});
 	}
 
 	static clearOfflineReviews() {

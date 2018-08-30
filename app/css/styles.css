@@ -303,6 +303,7 @@ header h1:hover, h1:focus {
 #reviews-list {
   margin: 0;
   padding: 0;
+  padding-bottom: 10%;
 }
 #reviews-list li {
   background-color: #fff;
