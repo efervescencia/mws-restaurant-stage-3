@@ -29,7 +29,7 @@ class DBHelper {
 			return idb.open('restaurants', 1, function (upgradeDb) {
 				upgradeDb.createObjectStore('restaurants', { keyPath: 'id' });
 				upgradeDb.createObjectStore('reviews', { keyPath: 'id' });
-				upgradeDb.createObjectStore('reviews-pending', {keyPath: 'id', autoIncrement: true});
+				upgradeDb.createObjectStore('reviews-pending', { keyPath: 'updatedAt' });
 			});
 	}
 

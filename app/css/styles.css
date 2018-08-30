@@ -291,7 +291,7 @@ header h1:hover, h1:focus {
   width: 90%;
 }
 #reviews-container {
-  padding: 30px 40px 80px;
+  padding: 5%;
 }
 #reviews-container h2 {
   color: #f58500;
@@ -309,14 +309,14 @@ header h1:hover, h1:focus {
     border: 2px solid #f3f3f3;
   display: block;
   list-style-type: none;
-  margin: 0 0 30px;
+  margin: 0 0 5%;
   overflow: hidden;
-  padding: 0 20px 20px;
+  padding: 0 5% 5%;
   position: relative;
   width: 85%;
 }
 #reviews-list li p {
-  margin: 0 0 10px;
+  margin: 0 0 2%;
 }
 #restaurant-hours td {
   color: #666;

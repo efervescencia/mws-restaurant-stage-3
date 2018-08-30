@@ -115,14 +115,24 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
     fillRestaurantHoursHTML();
   }
   // fill reviews
-  getReviews();
+  getReviews(restaurant);
 }
 
 
-getReviews = (restaurant_id = self.restaurant.id) =>{
+getReviews = (restaurant) =>{
+	//MAL IMPLEMENTADO FALTA LA PARTE DE CARGAR DE LA BASE DE DATOS
+	
+	//primero intentamos cargar de la base de datos
+	
+	//si no hay reviews en la base de datos y estamos online
+	//las intentamos cargar de internet y las metemos a la base de datos
+	
+	
+	//en ambos casos finalmente ponemos las reviews en la web
+	
 	
 
-					console.log("las reviews no estan en la base de datos");
+					console.log("las reviews del restaurant: "+restaurant.name+", no estan en la base de datos");
 					// los sacamos de internet
 		console.log(`${DBHelper.DATABASE_URL}/reviews/?restaurant_id=${restaurant_id}`);
 		fetch(`${DBHelper.DATABASE_URL}/reviews/?restaurant_id=${restaurant_id}`)
